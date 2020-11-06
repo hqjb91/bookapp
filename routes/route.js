@@ -64,7 +64,7 @@ module.exports = r = (pool) => {
             const lengthResults = lengthResponse[0].total;
 
             // Check for invalid queries
-            //(offset >= lengthResults || isNaN(offset) || offset < 0) ? offset = (lengthResults-limit) : offset = offset;
+            (offset > lengthResults || isNaN(offset) || offset < 0) ? offset = lengthResults-limit : offset = offset;
 
             const listResponse = await getBookList([charQuery, limit, offset]);
             const listResults = listResponse;
