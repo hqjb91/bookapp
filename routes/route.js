@@ -45,13 +45,15 @@ module.exports = r = (pool) => {
     router.get('/', (req, res) => {
         res.status(200);
         res.type('text/html');
-        res.render('index', {inputChars});
+        res.render('index', {inputChars, index:true});
     });
 
     // Configure the master list
     router.get('/master', async (req, res) => {
 
-        const charQuery = req.query.charQuery + '%';
+        const charQuery = req.query.charQuery.toString() + '%';
+        console.log(charQuery);
+
         const limit = 10;
         let offset = parseInt(req.query.offset) || 0;
 
@@ -62,7 +64,7 @@ module.exports = r = (pool) => {
             const lengthResults = lengthResponse[0].total;
 
             // Check for invalid queries
-            (offset >= lengthResults || isNaN(offset) || offset < 0) ? offset = (lengthResults-limit) : offset = offset;
+            //(offset >= lengthResults || isNaN(offset) || offset < 0) ? offset = (lengthResults-limit) : offset = offset;
 
             const listResponse = await getBookList([charQuery, limit, offset]);
             const listResults = listResponse;

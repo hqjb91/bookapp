@@ -3,7 +3,7 @@
 <div class="card mt-5">
     <div class="card-horizontal">
         <div class="img-square-wrapper">
-            <img class="mt-5" src="{{bookResults.image_url}}">
+            <img class="mt-5 mb-5" src="{{bookResults.image_url}}">
         </div>
         <div class="card-body">
             <h4 class="card-title">{{bookResults.title}}</h4>
@@ -18,7 +18,3 @@
         <small class="text-muted"><a href="/review?title={{bookResults.title}}&authorsList={{bookResults.authorsList}}" class="btn btn-primary">Find Review</a></small>
     </div>
 </div>
-
-<form action="/" method="GET">
-    <button type="submit" class="btn btn-primary mt-3">Back to Home</button>
-</form>

@@ -4,6 +4,7 @@ const hbs = require('express-handlebars');
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 const morgan = require('morgan');
+const path = require('path');
 
 // Configure port
 const PORT = parseInt(process.argv[2]) || parseInt(process.env.PORT) || 3000;
@@ -26,7 +27,12 @@ const router = require('./routes/route')(pool);
 const app = express();
 
 // Configure handlebars
-app.engine('hbs', hbs({defaultLayout:'default.hbs'}));
+app.engine('hbs', hbs({
+    extname: 'hbs', 
+    defaultLayout: 'default.hbs', 
+    layoutDir: path.join(__dirname, '/views/layouts'),
+    partialsDir: path.join(__dirname, 'views/partials'),
+ }));
 app.set('view engine', 'hbs');
 
 // Load morgan middleware for logging
@@ -35,7 +41,7 @@ app.use(morgan('combined'));
 // Configure the application
 
     // Load static files
-    app.use(express.static(__dirname + '/public'));
+    app.use(express.static(path.join(__dirname, '/public')));
 
     // Load router
     app.use('/', router);
