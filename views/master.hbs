@@ -1,0 +1,16 @@
+{{!-- master list page --}}
+<h1>Letter {{}}</h1>
+
+<ul>
+    {{#each}}
+    <li><a href="/detail/{{}}">{{}}</a></li>
+    {{/each}}
+</ul>
+
+<form action="/master" method="POST">
+    <input type="hidden" name="offset" value={{prevOffset}}><button type="submit">Previous</button>
+</form>
+
+<form action="/master" method="POST">
+    <input type="hidden" name="offset" value={{nextOffset}}><button type="submit">Next</button>
+</form>
