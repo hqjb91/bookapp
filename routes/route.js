@@ -14,7 +14,7 @@ const inputChars = [{value: "A", newRow: true}, {value: "B"}, {value: "C"}, {val
 {value: 5, newRow: true}, {value: 6}, {value: 7}, {value: 8}, {value: 9, endRow: true}];
 
 // SQL
-SQL_GET_BOOKLIST_FROM_CHAR = "select book_id, title from book2018 where title like ? limit ? offset ?";
+SQL_GET_BOOKLIST_FROM_CHAR = "select book_id, title from book2018 where title like ? order by title asc limit ? offset ?";
 SQL_GET_BOOKLIST_LENGTH_FROM_CHAR = "select count(*) as total from book2018 where title like ?";
 SQL_GET_BOOK_FROM_BOOKID = "select * from book2018 where book_id = ?";
 
@@ -86,7 +86,7 @@ module.exports = r = (pool) => {
                 authors: bookResults.authors.split('|'),
                 summary: bookResults.description,
                 pages: bookResults.pages,
-                rating: bookResults.rating,
+                rating: parseInt(bookResults.rating),
                 ratingCount: bookResults["rating_count"],
                 genre: bookResults.genres.split('|'),
             }
