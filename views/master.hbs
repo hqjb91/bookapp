@@ -1,22 +1,22 @@
 {{!-- master list page --}}
 <h1>Letter {{charQuery}}</h1>
 
-<ul>
+<ul class="list-group">
     {{#each listResults}}
-    <li><a href="/detail/{{this.book_id}}">{{this.title}}</a></li>
+    <li class="list-group-item"><a href="/detail/{{this.book_id}}">{{this.title}}</a></li>
     {{/each}}
 </ul>
 
-{{#unless start}}
+{{#unless isStart}}
 <form action="/master" method="POST">
     <input type="hidden" name="charQuery" value={{charQuery}}>
-    <input type="hidden" name="offset" value={{prevOffset}}><button type="submit">Previous</button>
+    <input type="hidden" name="offset" value={{prevOffset}}><button type="submit" class="btn btn-primary">Previous</button>
 </form>
 {{/unless}}
 
-{{#unless end}}
+{{#unless isEnd}}
 <form action="/master" method="POST">
     <input type="hidden" name="charQuery" value={{charQuery}}>
-    <input type="hidden" name="offset" value={{nextOffset}}><button type="submit">Next</button>
+    <input type="hidden" name="offset" value={{nextOffset}}><button type="submit" class="btn btn-primary d-inline">Next</button>
 </form>
 {{/unless}}

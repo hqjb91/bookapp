@@ -48,6 +48,9 @@ app.set('view engine', 'hbs');
 
 // Configure the application
 
+// Load static files
+app.use(express.static(__dirname + '/public'));
+
 // Configure landing page
 app.get('/', (req, res) => {
     res.status(200);
@@ -76,7 +79,7 @@ app.post('/master', express.urlencoded({extended: true}), async (req, res) => {
 
         res.status(200);
         res.type('text/html');
-        res.render('master', { charQuery: req.body.charQuery , listResults, start: offset === 0, end: offset >= lengthResults-limit,
+        res.render('master', { charQuery: req.body.charQuery , listResults, isStart: offset === 0, isEnd: offset >= lengthResults-limit,
                                 lengthResults, prevOffset: Math.max(offset-limit,0), 
                                 nextOffset:Math.min(offset+limit,lengthResults-limit) });
     } catch (e) {
@@ -136,6 +139,7 @@ app.get('/detail/:bookId', async (req, res) => {
 
 });
 
+// Configure review page
 app.get('/review', async (req, res) => {
     const endpoint = "https://api.nytimes.com/svc/books/v3/reviews.json";
     const url = withQuery(endpoint, {

@@ -1,0 +1,39 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family:'Roboto',sans-serif;
+}
+
+form {
+    display: inline-block;
+}
+
+.charBtn {
+    display:inline-block;
+    padding:0.6em 2em;
+    border:0.1em solid #000000;
+    margin:0.8em 0.4em 0.4em 0;
+    border-radius:0.12em;
+    text-decoration:none;
+    font-weight:bolder;
+    font-size: 1em;
+    color:#FFFFFF;
+    text-shadow: 0 0.04em 0.04em rgba(0,0,0,0.35);
+    background-color:#0275d8;
+    text-align:center;
+    transition: all 0.15s;
+    width: 10em;
+    border-radius: 1em;
+}
+
+.charBtn:hover{
+    text-shadow: 0 0 2em rgba(255,255,255,1);
+    color:#FFFFFF;
+    border-color:#FFFFFF;
+}
+
+h1 {
+    font-size: 2em;
+    line-height: 3em;
+}

@@ -1,15 +1,19 @@
 {{!-- landing page --}}
 
-<h1>My Bookstore</h1>
 <div class="container">
 
-        
+        <div class="row">
+            <div class="col">
+                <h1>My Bookstore</h1>
+            </div>
+        </div>
+
         {{#each inputChars}}
             {{#if this.newRow}}
             <div class="row">
             {{/if}}
                 <form action="/master" method="POST">
-                    <div class="col-md-2"><input type="hidden" name="charQuery" value="{{this.value}}"><button type="submit">{{this.value}}</button></div>
+                    <div class="col-md-2"><input type="hidden" name="charQuery" value="{{this.value}}"><button type="submit" class="charBtn">{{this.value}}</button></div>
                 </form>
             {{#if this.endRow}}
             </div>
