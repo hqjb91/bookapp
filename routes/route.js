@@ -18,7 +18,28 @@ SQL_GET_BOOKLIST_FROM_CHAR = "select book_id, title from book2018 where title li
 SQL_GET_BOOKLIST_LENGTH_FROM_CHAR = "select count(*) as total from book2018 where title like ?";
 SQL_GET_BOOK_FROM_BOOKID = "select * from book2018 where book_id = ?";
 
+// Define closure 
+const mkQuery = (sqlQuery, pool) => {
+    return f = async (params) => {
+        const conn = await pool.getConnection();
+
+        try {
+            const response = await conn.query(sqlQuery, params);
+            return response[0];
+        } catch (e) {
+            return Promise.reject(e);
+        } finally {
+            conn.release();
+        }
+    }
+}
+
 module.exports = r = (pool) => {
+
+    // Create closure functions
+    const getBookList = mkQuery(SQL_GET_BOOKLIST_FROM_CHAR, pool);
+    const getBookListLength = mkQuery(SQL_GET_BOOKLIST_LENGTH_FROM_CHAR, pool);
+    const getBookFromId = mkQuery(SQL_GET_BOOK_FROM_BOOKID, pool);
 
     // Configure landing page
     router.get('/', (req, res) => {
@@ -35,17 +56,16 @@ module.exports = r = (pool) => {
         let offset = parseInt(req.query.offset) || 0;
 
         // console.log("Offset is :" + offset);
-        const conn = await pool.getConnection();
 
         try {
-            const lengthResponse = await conn.query(SQL_GET_BOOKLIST_LENGTH_FROM_CHAR, [charQuery]);
-            const lengthResults = lengthResponse[0][0].total;
+            const lengthResponse = await getBookListLength([charQuery]);
+            const lengthResults = lengthResponse[0].total;
 
             // Check for invalid queries
             (offset >= lengthResults || isNaN(offset) || offset < 0) ? offset = (lengthResults-limit) : offset = offset;
 
-            const listResponse = await conn.query(SQL_GET_BOOKLIST_FROM_CHAR, [charQuery, limit, offset]);
-            const listResults = listResponse[0];
+            const listResponse = await getBookList([charQuery, limit, offset]);
+            const listResults = listResponse;
 
             // Create array to paginate the list
             const numOfPages = Math.ceil(lengthResults/limit);
@@ -68,8 +88,6 @@ module.exports = r = (pool) => {
             res.status(500);
             res.type('text/html');
             res.send(JSON.stringify(e));
-        } finally {
-            conn.release();
         }
     });
 
@@ -78,11 +96,9 @@ module.exports = r = (pool) => {
         res.status(200);
         const {bookId} = req.params;
 
-        const conn = await pool.getConnection();
-
         try {
-            const bookResponse = await conn.query(SQL_GET_BOOK_FROM_BOOKID, [bookId]);
-            const bookResults = bookResponse[0][0];
+            const bookResponse = await getBookFromId([bookId]);
+            const bookResults = bookResponse[0];
 
             // Parse into required JSON
             const bookResultsJSON = {
@@ -122,10 +138,7 @@ module.exports = r = (pool) => {
             res.status(500);
             res.type('text/html');
             res.send(JSON.stringify(e));
-        } finally {
-            conn.release();
         }
-
     });
 
     // Configure review page
