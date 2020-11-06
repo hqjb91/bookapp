@@ -97,19 +97,33 @@ app.get('/detail/:bookId', async (req, res) => {
         const bookResponse = await conn.query(SQL_GET_BOOK_FROM_BOOKID, [bookId]);
         const bookResults = bookResponse[0][0];
 
-
         res.status(200);
         res.format({
             'text/html': () => {
+                res.type('text/html');
                 res.render('detail', {bookResults});
             },
             'application/json': () => {
-                res.json(bookResults);
+                res.type('application/json');
+                const bookResultsJSON = {
+                    bookId: bookResults.book_id,
+                    title: bookResults.title,
+                    authors: bookResults.authors.split('|'),
+                    summary: bookResults.description,
+                    pages: bookResults.pages,
+                    rating: bookResults.rating,
+                    ratingCount: bookResults["rating_count"],
+                    genre: bookResults.genres.split('|'),
+                }
+
+                res.json(bookResultsJSON);
             },
             'default': () => {
-    
+                res.type('text/plain');
+                res.send('Please use html/json');
             }
-        })
+            
+        });
     } catch (e) {
         res.status(500);
         res.type('text/html');
@@ -118,6 +132,19 @@ app.get('/detail/:bookId', async (req, res) => {
         conn.release();
     }
 
+});
+
+app.get('/review', async (req, res) => {
+    const endpoint = "https://api.nytimes.com/svc/books/v3/reviews.json";
+    const url = withQuery(endpoint, {
+        title : req.query.title,
+        "api-key" : process.env.NYT_API_KEY
+    });
+
+    const reviewResponse = await fetch(url);
+    const reviewResults = await reviewResponse.json();
+
+    console.log(reviewResults);
 });
 
 // Configure 404 page
