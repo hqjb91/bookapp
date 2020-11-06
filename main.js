@@ -76,7 +76,9 @@ app.post('/master', express.urlencoded({extended: true}), async (req, res) => {
 
         res.status(200);
         res.type('text/html');
-        res.render('master', { charQuery: req.body.charQuery , listResults, lengthResults, prevOffset: Math.max(offset-limit,0), nextOffset:Math.min(offset+limit,lengthResults-limit) });
+        res.render('master', { charQuery: req.body.charQuery , listResults, start: offset === 0, end: offset >= lengthResults-limit,
+                                lengthResults, prevOffset: Math.max(offset-limit,0), 
+                                nextOffset:Math.min(offset+limit,lengthResults-limit) });
     } catch (e) {
         res.status(500);
         res.type('text/html');
