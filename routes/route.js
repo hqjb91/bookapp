@@ -43,7 +43,7 @@ module.exports = r = (pool) => {
             const lengthResponse = await conn.query(SQL_GET_BOOKLIST_LENGTH_FROM_CHAR, [charQuery]);
             const lengthResults = lengthResponse[0][0].total;
 
-            const numOfPages = Math.floor(lengthResults/limit);
+            const numOfPages = Math.ceil(lengthResults/limit);
             const arrayOfPages = [];
             const populateArrayOfPages = () => {
                 for(let i=1; i<=numOfPages; i++){
