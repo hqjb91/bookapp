@@ -59,11 +59,11 @@ app.get('/', (req, res) => {
 });
 
 // Configure the master list
-app.post('/master', express.urlencoded({extended: true}), async (req, res) => {
+app.get('/master', async (req, res) => {
 
-    const charQuery = req.body.charQuery + '%';
+    const charQuery = req.query.charQuery + '%';
     const limit = 10;
-    const offset = parseInt(req.body.offset) || 0;
+    const offset = parseInt(req.query.offset) || 0;
     // console.log("Offset is :" + offset);
     const conn = await pool.getConnection();
 
@@ -74,14 +74,22 @@ app.post('/master', express.urlencoded({extended: true}), async (req, res) => {
         const lengthResponse = await conn.query(SQL_GET_BOOKLIST_LENGTH_FROM_CHAR, [charQuery]);
         const lengthResults = lengthResponse[0][0].total;
 
+        const numOfPages = Math.floor(lengthResults/limit);
+        const arrayOfPages = [];
+        const populateArrayOfPages = () => {
+            for(let i=1; i<=numOfPages; i++){
+                arrayOfPages.push({pagenumber : i, offset: (i-1)*limit});
+            };
+        };
+        populateArrayOfPages();
+
         // console.log("Total is :" + lengthResults);
         // console.log("Left :" + (lengthResults-offset));
 
         res.status(200);
         res.type('text/html');
-        res.render('master', { charQuery: req.body.charQuery , listResults, isStart: offset === 0, isEnd: offset >= lengthResults-limit,
-                                lengthResults, prevOffset: Math.max(offset-limit,0), 
-                                nextOffset:Math.min(offset+limit,lengthResults-limit) });
+        res.render('master', { charQuery: req.query.charQuery , listResults, isStart: offset === 0, isEnd: offset >= lengthResults-limit,
+                                lengthResults, prevOffset: offset-limit, arrayOfPages, nextOffset:offset+limit });
     } catch (e) {
         res.status(500);
         res.type('text/html');
@@ -102,6 +110,22 @@ app.get('/detail/:bookId', async (req, res) => {
         const bookResponse = await conn.query(SQL_GET_BOOK_FROM_BOOKID, [bookId]);
         const bookResults = bookResponse[0][0];
 
+        // Parse into required JSON
+        const bookResultsJSON = {
+            bookId: bookResults.book_id,
+            title: bookResults.title,
+            authors: bookResults.authors.split('|'),
+            summary: bookResults.description,
+            pages: bookResults.pages,
+            rating: bookResults.rating,
+            ratingCount: bookResults["rating_count"],
+            genre: bookResults.genres.split('|'),
+        }
+
+        // Parse the authors and genres string
+        bookResults.authors = bookResults.authors.replaceAll("|", ", ");
+        bookResults.genres = bookResults.genres.replaceAll("|", ", ");
+
         res.status(200);
         res.format({
             'text/html': () => {
@@ -110,17 +134,6 @@ app.get('/detail/:bookId', async (req, res) => {
             },
             'application/json': () => {
                 res.type('application/json');
-                const bookResultsJSON = {
-                    bookId: bookResults.book_id,
-                    title: bookResults.title,
-                    authors: bookResults.authors.split('|'),
-                    summary: bookResults.description,
-                    pages: bookResults.pages,
-                    rating: bookResults.rating,
-                    ratingCount: bookResults["rating_count"],
-                    genre: bookResults.genres.split('|'),
-                }
-
                 res.json(bookResultsJSON);
             },
             'default': () => {

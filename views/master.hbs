@@ -7,16 +7,43 @@
     {{/each}}
 </ul>
 
-{{#unless isStart}}
-<form action="/master" method="POST">
-    <input type="hidden" name="charQuery" value={{charQuery}}>
-    <input type="hidden" name="offset" value={{prevOffset}}><button type="submit" class="btn btn-primary">Previous</button>
-</form>
-{{/unless}}
+<nav class="mt-5">
+  <ul class="pagination">
+    <li class="page-item">
+    {{#if isStart}}
+    <form action="/master" method="GET">
+        <input type="hidden" name="charQuery" value={{charQuery}}>
+        <input type="hidden" name="offset" value={{prevOffset}}><button type="submit" class="btn btn-primary" disabled>Previous</button>
+    </form>
+    {{else}}
+    <form action="/master" method="GET">
+        <input type="hidden" name="charQuery" value={{charQuery}}>
+        <input type="hidden" name="offset" value={{prevOffset}}><button type="submit" class="btn btn-primary">Previous</button>
+    </form>    
+    {{/if}}
+    </li>
 
-{{#unless isEnd}}
-<form action="/master" method="POST">
-    <input type="hidden" name="charQuery" value={{charQuery}}>
-    <input type="hidden" name="offset" value={{nextOffset}}><button type="submit" class="btn btn-primary d-inline">Next</button>
-</form>
-{{/unless}}
+    {{#each arrayOfPages}}
+    <li class="page-item">
+        <form action="/master" method="GET">
+            <input type="hidden" name="charQuery" value={{../charQuery}}>
+            <input type="hidden" name="offset" value="{{this.offset}}">
+            <button type="submit" class="btn btn-default">{{this.pagenumber}}</button>
+        </form>
+    </li>
+    {{/each}}
+
+    {{#if isEnd}}
+    <form action="/master" method="GET">
+        <input type="hidden" name="charQuery" value={{charQuery}}>
+        <input type="hidden" name="offset" value={{nextOffset}}><button type="submit" class="btn btn-primary" disabled>Next</button>
+    </form>
+    {{else}}
+    <form action="/master" method="GET">
+        <input type="hidden" name="charQuery" value={{charQuery}}>
+        <input type="hidden" name="offset" value={{nextOffset}}><button type="submit" class="btn btn-primary">Next</button>
+    </form>
+    {{/if}}
+   </li>
+  </ul>
+</nav>

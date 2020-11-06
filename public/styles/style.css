@@ -37,3 +37,8 @@ h1 {
     font-size: 2em;
     line-height: 3em;
 }
+
+.card-horizontal {
+    display: flex;
+    flex: 1 1 auto;
+}

@@ -1,13 +1,19 @@
 {{!-- detailed page --}}
 
-<div class="card" style="width: 18rem;">
-  <img class="card-img-top" src="{{bookResults.image_url}}" >
-  <div class="card-body">
-    <h5 class="card-title">{{bookResults.title}}</h5>
-    <p class="card-text">{{bookResults.authors}}</p>
-    <p class="card-text">{{bookResults.pages}}</p>
-    <p class="card-text">{{bookResults.genres}}</p>
-    <p class="card-text">{{bookResults.description}}</p>
-    <a href="/review?title={{bookResults.title}}" class="btn btn-primary">Find Review</a>
-  </div>
+<div class="card mt-5">
+    <div class="card-horizontal">
+        <div class="img-square-wrapper">
+            <img class="mt-5" src="{{bookResults.image_url}}">
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">{{bookResults.title}}</h4>
+                <p class="card-text mb-2"> Authors : {{bookResults.authors}}</p>
+                <p class="card-text mb-2"> Number of pages : {{bookResults.pages}}</p>
+                <p class="card-text mb-2">Genres : {{bookResults.genres}}</p>
+                <p class="card-text mb-2">Description : {{bookResults.description}}</p>
+        </div>
+    </div>
+    <div class="card-footer">
+        <small class="text-muted"><a href="/review?title={{bookResults.title}}" class="btn btn-primary">Find Review</a></small>
+    </div>
 </div>
