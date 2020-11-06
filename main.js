@@ -17,8 +17,23 @@ const inputChars = [{value: "A", newRow: true}, {value: "B"}, {value: "C"}, {val
 {value: 0, newRow: true}, {value: 1}, {value: 2}, {value: 3}, {value: 4, endRow: true}, 
 {value: 5, newRow: true}, {value: 6}, {value: 7}, {value: 8}, {value: 9, endRow: true}];
 
+// SQL
+SQL_GET_BOOKLIST_FROM_CHAR = "select book_id, title from book2018 where title like ? limit ? offset ?";
+SQL_GET_BOOKLIST_LENGTH_FROM_CHAR = "select count(*) from book2018 where title like ?";
+
 // Configure port
 const PORT = parseInt(process.argv[2]) || parseInt(process.env.PORT) || 3000;
+
+// Create connection pool
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 3306,
+    database: process.env.DB_NAME || 'goodreads',
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    connectionLimit: 4,
+    timezone: '+08:00'
+});
 
 // Create express instance
 const app = express();
@@ -28,7 +43,7 @@ app.engine('hbs', hbs({defaultLayout:'default.hbs'}));
 app.set('view engine', 'hbs');
 
 // Load morgan middleware for logging
-// app.use(morgan('combined'));
+//app.use(morgan('combined'));
 
 // Configure the application
 
@@ -40,10 +55,32 @@ app.get('/', (req, res) => {
 });
 
 // Configure the master list
-app.post('/master', (req, res) => {
-    res.status(200);
-    res.type('text/html');
-    res.render('master');
+app.post('/master', express.urlencoded({extended: true}), async (req, res) => {
+
+    const charQuery = req.body.charQuery + '%';
+    const limit = 10;
+    const offset = 0;
+    const conn = await pool.getConnection();
+    console.log(req.body.charQuery);
+
+    try {
+        const listResponse = await conn.query(SQL_GET_BOOKLIST_FROM_CHAR, [charQuery, limit, offset]);
+        const listResults = listResponse[0];
+
+        const lengthResponse = await conn.query(SQL_GET_BOOKLIST_LENGTH_FROM_CHAR, [charQuery]);
+        const lengthResults = lengthResponse[0];
+        console.log(lengthResults);
+
+        res.status(200);
+        res.type('text/html');
+        res.render('master', { charQuery: req.body.charQuery , listResults, lengthResults });
+    } catch (e) {
+        res.status(500);
+        res.type('text/html');
+        res.send(JSON.stringify(e));
+    } finally {
+        conn.release();
+    }
 });
 
 // Configure 404 page
@@ -53,7 +90,19 @@ app.use((req, res) => {
     res.render('404');
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`You have connected at ${PORT} at ${new Date()}.`);
-});
+// Start the server and ping database to test
+pool.getConnection()
+    .then(conn => {
+        console.log('Pinging database...');
+        const p1 = Promise.resolve(conn);
+        const p2 = conn.ping();
+        return Promise.all([ p1, p2 ]);
+    })
+    .then(( results ) => { //results is an array of p1 and p2
+        const conn = results[0];
+        conn.release();
+        app.listen(PORT, () => {
+            console.log(`Server has started on port ${PORT} at ${new Date()}.`);
+        });
+    })
+    .catch(e => console.log(e));

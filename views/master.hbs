@@ -1,9 +1,9 @@
 {{!-- master list page --}}
-<h1>Letter {{}}</h1>
+<h1>Letter {{charQuery}}</h1>
 
 <ul>
-    {{#each}}
-    <li><a href="/detail/{{}}">{{}}</a></li>
+    {{#each results}}
+    <li><a href="/detail/{{this.book_id}}">{{this.title}}</a></li>
     {{/each}}
 </ul>
 
