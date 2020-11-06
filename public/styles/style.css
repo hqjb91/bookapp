@@ -33,8 +33,9 @@ form {
 }
 
 h1 {
-    font-size: 2em;
-    line-height: 3em;
+    font-size: 3em !important;
+    line-height: 3em !important;
+    font-weight:bolder !important;
 }
 
 .card-horizontal {
