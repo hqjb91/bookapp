@@ -32,17 +32,22 @@ module.exports = r = (pool) => {
 
         const charQuery = req.query.charQuery + '%';
         const limit = 10;
-        const offset = parseInt(req.query.offset) || 0;
+        let offset = parseInt(req.query.offset) || 0;
+
         // console.log("Offset is :" + offset);
         const conn = await pool.getConnection();
 
         try {
-            const listResponse = await conn.query(SQL_GET_BOOKLIST_FROM_CHAR, [charQuery, limit, offset]);
-            const listResults = listResponse[0];
-
             const lengthResponse = await conn.query(SQL_GET_BOOKLIST_LENGTH_FROM_CHAR, [charQuery]);
             const lengthResults = lengthResponse[0][0].total;
 
+            // Check for invalid queries
+            (offset >= lengthResults || isNaN(offset) || offset < 0) ? offset = (lengthResults-limit) : offset = offset;
+
+            const listResponse = await conn.query(SQL_GET_BOOKLIST_FROM_CHAR, [charQuery, limit, offset]);
+            const listResults = listResponse[0];
+
+            // Create array to paginate the list
             const numOfPages = Math.ceil(lengthResults/limit);
             const arrayOfPages = [];
             const populateArrayOfPages = () => {
@@ -97,6 +102,8 @@ module.exports = r = (pool) => {
             bookResults.genres = bookResults.genres.replaceAll("|", ", ");
 
             res.status(200);
+
+            // Content negotiation
             res.format({
                 'text/html': () => {
                     res.type('text/html');
@@ -132,7 +139,6 @@ module.exports = r = (pool) => {
 
         const reviewResponse = await fetch(url);
         const reviewResults = await reviewResponse.json();
-        console.log(reviewResults);
 
         res.status(200);
         res.type('text/html');

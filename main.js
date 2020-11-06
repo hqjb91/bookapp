@@ -30,7 +30,7 @@ app.engine('hbs', hbs({defaultLayout:'default.hbs'}));
 app.set('view engine', 'hbs');
 
 // Load morgan middleware for logging
-// app.use(morgan('combined'));
+app.use(morgan('combined'));
 
 // Configure the application
 
