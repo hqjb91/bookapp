@@ -123,6 +123,7 @@ app.get('/detail/:bookId', async (req, res) => {
         }
 
         // Parse the authors and genres string
+        bookResults.authorsList = bookResults.authors.replaceAll("|", " and ");
         bookResults.authors = bookResults.authors.replaceAll("|", ", ");
         bookResults.genres = bookResults.genres.replaceAll("|", ", ");
 
@@ -140,7 +141,6 @@ app.get('/detail/:bookId', async (req, res) => {
                 res.type('text/plain');
                 res.send('Please use html/json');
             }
-
         });
     } catch (e) {
         res.status(500);
@@ -156,6 +156,7 @@ app.get('/detail/:bookId', async (req, res) => {
 app.get('/review', async (req, res) => {
     const endpoint = "https://api.nytimes.com/svc/books/v3/reviews.json";
     const url = withQuery(endpoint, {
+        author: req.query.authorsList,
         title : req.query.title,
         "api-key" : process.env.NYT_API_KEY
     });

@@ -7,6 +7,10 @@
     {{/each}}
 </ul>
 
+{{#unless listResults.length}}
+No results found
+{{/unless}}
+
 <nav class="mt-5">
   <ul class="pagination">
     <li class="page-item">
@@ -36,14 +40,18 @@
     {{#if isEnd}}
     <form action="/master" method="GET">
         <input type="hidden" name="charQuery" value={{charQuery}}>
-        <input type="hidden" name="offset" value={{nextOffset}}><button type="submit" class="btn btn-primary" disabled>Next</button>
+        <input type="hidden" name="offset" value={{nextOffset}}><button type="submit" class="btn btn-primary ml-3" disabled>Next</button>
     </form>
     {{else}}
     <form action="/master" method="GET">
         <input type="hidden" name="charQuery" value={{charQuery}}>
-        <input type="hidden" name="offset" value={{nextOffset}}><button type="submit" class="btn btn-primary">Next</button>
+        <input type="hidden" name="offset" value={{nextOffset}}><button type="submit" class="btn btn-primary ml-3">Next</button>
     </form>
     {{/if}}
    </li>
   </ul>
 </nav>
+
+<form action="/" method="GET">
+    <button type="submit" class="btn btn-primary">Back to Home</button>
+</form>
