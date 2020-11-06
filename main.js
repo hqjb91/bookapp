@@ -122,7 +122,7 @@ app.get('/detail/:bookId', async (req, res) => {
                 res.type('text/plain');
                 res.send('Please use html/json');
             }
-            
+
         });
     } catch (e) {
         res.status(500);
@@ -143,8 +143,11 @@ app.get('/review', async (req, res) => {
 
     const reviewResponse = await fetch(url);
     const reviewResults = await reviewResponse.json();
-
     console.log(reviewResults);
+
+    res.status(200);
+    res.type('text/html');
+    res.render('review', {reviewResults: reviewResults.results, resultsLength: reviewResults.num_results});
 });
 
 // Configure 404 page

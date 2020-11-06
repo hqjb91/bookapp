@@ -1,0 +1,20 @@
+{{!-- Review page --}}
+
+{{#if resultsLength}}
+
+{{#each reviewResults}}
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">{{this.book_title}} by {{this.book_author}}</h5>
+    <p class="card-text">Reviewed by {{this.byline}} on {{this.publication_dt}} :
+        {{this.summary}}
+    </p>
+    <a href="{{this.url}}" class="btn btn-primary">Full Review</a>
+    Copyright &copy; 2020. The New York Times Company. All Rights Reserved.
+  </div>
+</div>
+{{/each}}
+
+{{else}}
+    There are no results.
+{{/if}}
