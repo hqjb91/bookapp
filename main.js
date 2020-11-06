@@ -19,7 +19,8 @@ const inputChars = [{value: "A", newRow: true}, {value: "B"}, {value: "C"}, {val
 
 // SQL
 SQL_GET_BOOKLIST_FROM_CHAR = "select book_id, title from book2018 where title like ? limit ? offset ?";
-SQL_GET_BOOKLIST_LENGTH_FROM_CHAR = "select count(*) from book2018 where title like ?";
+SQL_GET_BOOKLIST_LENGTH_FROM_CHAR = "select count(*) as total from book2018 where title like ?";
+SQL_GET_BOOK_FROM_BOOKID = "select * from book2018 where book_id = ?";
 
 // Configure port
 const PORT = parseInt(process.argv[2]) || parseInt(process.env.PORT) || 3000;
@@ -59,21 +60,23 @@ app.post('/master', express.urlencoded({extended: true}), async (req, res) => {
 
     const charQuery = req.body.charQuery + '%';
     const limit = 10;
-    const offset = 0;
+    const offset = parseInt(req.body.offset) || 0;
+    // console.log("Offset is :" + offset);
     const conn = await pool.getConnection();
-    console.log(req.body.charQuery);
 
     try {
         const listResponse = await conn.query(SQL_GET_BOOKLIST_FROM_CHAR, [charQuery, limit, offset]);
         const listResults = listResponse[0];
 
         const lengthResponse = await conn.query(SQL_GET_BOOKLIST_LENGTH_FROM_CHAR, [charQuery]);
-        const lengthResults = lengthResponse[0];
-        console.log(lengthResults);
+        const lengthResults = lengthResponse[0][0].total;
+
+        // console.log("Total is :" + lengthResults);
+        // console.log("Left :" + (lengthResults-offset));
 
         res.status(200);
         res.type('text/html');
-        res.render('master', { charQuery: req.body.charQuery , listResults, lengthResults });
+        res.render('master', { charQuery: req.body.charQuery , listResults, lengthResults, prevOffset: Math.max(offset-limit,0), nextOffset:Math.min(offset+limit,lengthResults-limit) });
     } catch (e) {
         res.status(500);
         res.type('text/html');
@@ -81,6 +84,40 @@ app.post('/master', express.urlencoded({extended: true}), async (req, res) => {
     } finally {
         conn.release();
     }
+});
+
+// Configure the detailed page
+app.get('/detail/:bookId', async (req, res) => {
+    res.status(200);
+    const {bookId} = req.params;
+
+    const conn = await pool.getConnection();
+
+    try {
+        const bookResponse = await conn.query(SQL_GET_BOOK_FROM_BOOKID, [bookId]);
+        const bookResults = bookResponse[0][0];
+
+
+        res.status(200);
+        res.format({
+            'text/html': () => {
+                res.render('detail', {bookResults});
+            },
+            'application/json': () => {
+                res.json(bookResults);
+            },
+            'default': () => {
+    
+            }
+        })
+    } catch (e) {
+        res.status(500);
+        res.type('text/html');
+        res.send(JSON.stringify(e));
+    } finally {
+        conn.release();
+    }
+
 });
 
 // Configure 404 page
